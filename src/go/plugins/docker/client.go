@@ -22,6 +22,7 @@ package docker
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net"
 	"net/http"
@@ -67,6 +68,7 @@ func newClient(endpoint string, timeout int) *client {
 		tcpEndpoint = tcpAddress
 	}
 
+	fmt.Printf("Docker - newClient - connectionType: %d, tcpEndoint: %s\n", connectionType, tcpEndpoint)
 	client := client{
 		client: http.Client{
 			Transport: transport,
@@ -84,8 +86,10 @@ func (cli *client) Query(queryPath string) ([]byte, error) {
 	var err error
 
 	if cli.connectionType == UnixSocket {
+		fmt.Printf("Docker - Query - connectionType: %d\n", cli.connectionType)
 		resp, err = cli.client.Get("http://" + path.Join(dockerVersion, queryPath))
 	} else if cli.connectionType == TCP {
+		fmt.Printf("Docker - Query - connectionType: %d, tcpEndoint: %s\n", cli.connectionType, cli.tcpEndpoint)
 		resp, err = cli.client.Get("http://" + path.Join(cli.tcpEndpoint, queryPath))
 	}
 
